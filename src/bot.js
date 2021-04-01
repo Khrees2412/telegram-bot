@@ -1,12 +1,5 @@
 const TelegramBot = require("node-telegram-bot-api");
-
-let bot;
-if (process.env.NODE_ENV === "production") {
-  bot = new TelegramBot(process.env.BOT_APIKEY);
-  bot.setWebHook(process.env.HEROKU_URL + bot.token);
-} else {
-  bot = new TelegramBot(process.env.BOT_APIKEY, { polling: true });
-}
+const bot = new TelegramBot(process.env.BOT_APIKEY, { polling: true });
 
 const { searchUser, searchRepo } = require("./index");
 
@@ -46,9 +39,9 @@ bot.on("message", async (msg) => {
         repos_url,
         public_repos,
         name,
-        company,
-        website,
-        email,
+        // company,
+        // website,
+        // email,
         bio,
       } = result;
       if (!result) {
@@ -60,18 +53,7 @@ bot.on("message", async (msg) => {
         bot.sendPhoto(chatId, avatar_url);
         bot.sendMessage(
           chatId,
-          `
-        name: ${name} \n
-        username: ${login} \n
-        bio: ${bio} \n
-        link to GitHub profile: ${html_url} \n
-        ${website} \n
-        ${email ? email : ""} \n
-        ${company ? company : ""} \n
-        follower: ${followers} \n
-        repos url:${repos_url} \n
-        number of public repos: ${public_repos} \n
-        `
+          `Name: ${name} \nUsername: ${login} \nBio: ${bio} \nLink to GitHub profile: ${html_url} \nFollower count: ${followers} \nRepos url: ${repos_url} \nNumber of public repos: ${public_repos} \n`
         );
       }
     } catch (error) {
@@ -87,8 +69,8 @@ bot.onText(/\/repo/, async (msg) => {
     { parse_mode: "Markdown" }
   );
 });
-bot.on("message", (message) => {
-  if (message !== "/repo") return;
+bot.on("message", async (message) => {
+  if (message === "/repo") return;
   const msg = message.text.split(" ");
 
   let github_repo = msg[0];
@@ -105,7 +87,7 @@ bot.on("message", (message) => {
       }
     );
 
-    const result = searchRepo(github_user, github_repo);
+    const result = await searchRepo(github_user, github_repo);
     const {
       homepage,
       name,
@@ -115,6 +97,7 @@ bot.on("message", (message) => {
       license,
       forks_count,
       subscribers_count,
+      stargazers_count,
     } = result;
     const { avatar_url } = owner;
     if (!result) {
@@ -126,15 +109,7 @@ bot.on("message", (message) => {
       bot.sendPhoto(chatId, avatar_url);
       bot.sendMessage(
         chatId,
-        `
-      name: ${name} \n
-      homepage: ${homepage}
-      description: ${description} \n
-      language: ${language} \n
-      license: ${license.name} \n
-      forks: ${forks_count} \n
-      subsrcibers: ${subscribers_count}
-      `
+        `Name: ${name} \nStars: ${stargazers_count} \nHomepage: ${homepage} \nDescription: ${description} \nLanguage: ${language} \nLicense: ${license.name} \nForks: ${forks_count} \nSubsrcibers: ${subscribers_count}`
       );
     }
   } catch (error) {

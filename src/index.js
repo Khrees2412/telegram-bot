@@ -12,7 +12,6 @@ async function searchUser(username) {
     console.error(error);
   }
 
-  console.log(userDetails);
   return userDetails;
 }
 
@@ -26,7 +25,6 @@ async function searchRepo(username, repo) {
     console.error(error);
   }
 
-  console.log(repoDetails);
   return repoDetails;
 }
 
