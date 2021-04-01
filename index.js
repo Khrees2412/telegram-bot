@@ -1,10 +1,8 @@
 const express = require("express");
 const app = express();
-const { searchUser, searchRepo } = require("./src/index");
-
 require("dotenv").config();
 const packageInfo = require("./package.json");
-// require("./src/bot");
+require("./src/bot");
 
 app.get("/", function (req, res) {
   res.json({
@@ -14,13 +12,6 @@ app.get("/", function (req, res) {
   });
 });
 
-//API route
-app.get("/api/search", (req, res) => {
-  scraper
-    .youtube(req.query.q, req.query.page)
-    .then((x) => res.json(x))
-    .catch((e) => res.send(e));
-});
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
